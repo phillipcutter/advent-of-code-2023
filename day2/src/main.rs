@@ -49,14 +49,14 @@ fn possible(input: &str, red: u32, green: u32, blue: u32) -> i32 {
 
         println!("\tInstance {}, red: {}, green: {}, blue: {}", game, colors_used.get("red").unwrap_or(&0), colors_used.get("green").unwrap_or(&0), colors_used.get("blue").unwrap_or(&0));
 
-        if (*colors_used.get("red").unwrap_or(&0) > red) {
+        if *colors_used.get("red").unwrap_or(&0) > red {
             possible = false;
             println!("\tImpossible for red");
-        } else if (*colors_used.get("green").unwrap_or(&0) > green) {
+        } else if *colors_used.get("green").unwrap_or(&0) > green {
             possible = false;
             println!("\tImpossible for green");
 
-        } else if (*colors_used.get("blue").unwrap_or(&0) > blue) {
+        } else if *colors_used.get("blue").unwrap_or(&0) > blue {
             possible = false;
             println!("\tImpossible for blue");
 
@@ -64,17 +64,14 @@ fn possible(input: &str, red: u32, green: u32, blue: u32) -> i32 {
     }
 
     println!("\tPossible: {}", possible);
-    return if possible { game_id } else { -1 };
+    if possible { game_id } else { -1 }
 }
 
-fn possible_part_two(input: &str) -> (u32, u32, u32) {
+fn possible_part_two(input: &str) -> (u32, u32, u32) { 
     let outer = Regex::new(r"Game (?P<game>\d+): (.+)").unwrap();
     let caps = outer.captures(input).unwrap();
 
     let contents = caps.get(2).unwrap().as_str();
-    let game_id: i32 = caps.name("game").unwrap().as_str().parse().unwrap();
-
-    let mut possible = true;
 
     println!("{} -> {}", input, contents);
     let game_re = Regex::new(r"(?P<number>\d+) (?P<color>[a-z]+)").unwrap();
@@ -91,5 +88,5 @@ fn possible_part_two(input: &str) -> (u32, u32, u32) {
     }
 
     println!("\tMinimum red: {}, green: {}, blue: {}", colors_used.get("red").unwrap_or(&0), colors_used.get("green").unwrap_or(&0), colors_used.get("blue").unwrap_or(&0));
-    return (*colors_used.get("red").unwrap_or(&0), *colors_used.get("green").unwrap_or(&0), *colors_used.get("blue").unwrap_or(&0))
+    (*colors_used.get("red").unwrap_or(&0), *colors_used.get("green").unwrap_or(&0), *colors_used.get("blue").unwrap_or(&0))
 }
