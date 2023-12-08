@@ -12,6 +12,10 @@ fn main() {
 
     // println!("{schematic:?}");
     println!("Sum of part numbers: {sum_of_part_nums}");
+
+    let sum_of_gear_ratios = get_sum_of_gear_ratios(&schematic);
+
+    println!("Sum of gear ratios: {sum_of_gear_ratios}");
 }
 
 fn load_schematic_to_vec(contents: &str) -> Vec<Vec<char>> {
@@ -72,6 +76,75 @@ fn get_sum_of_part_nums(schematic: &Vec<Vec<char>>) -> u32 {
         }
     }
     sum
+}
+
+fn get_sum_of_gear_ratios(schematic: &Vec<Vec<char>>) -> i32 {
+    let mut sum = 0;
+
+    for (row_i, row) in schematic.iter().enumerate() {
+        if (row_i == 0) {
+            continue
+        }
+
+        for (i, c) in row.iter().enumerate() {
+            if (*c == '*') {
+                let adjacent_nums = get_adjacent_nums(schematic, row_i, i);
+                if adjacent_nums.len() == 2 {
+                    sum += adjacent_nums[0] * adjacent_nums[1];
+                }
+            }
+        }
+    }
+    sum
+}
+
+fn get_adjacent_nums(schematic: &Vec<Vec<char>>, row_i: usize, col_i: usize) -> Vec<i32> {
+    let mut nums = Vec::new();
+
+    for i in 0..3 {
+        let mut is_num = false;
+        for j in 0..3 {
+            if schematic[row_i + i - 1][col_i + j - 1].is_numeric() {
+                is_num = true;
+            } else if (is_num) {
+                // Up to col_i + j - 1 is a number, need to look backwards + forwards
+                let num = get_num(schematic, row_i + i - 1, col_i + j - 2);
+                nums.push(num);
+                is_num = false;
+            }
+        }
+        if (is_num) {
+            // col_i + 1 and backwards is a number, look forward + backward
+            nums.push(get_num(schematic, row_i + i - 1, col_i));
+        }
+    }
+    nums
+}
+
+fn get_num(schematic: &Vec<Vec<char>>, row_i: usize, col_i: usize) -> i32 {
+    let mut chars: Vec<char> = Vec::new();
+    let mut start = col_i;
+    for i in 0..schematic[row_i].len() {
+        let c = schematic[row_i][start];
+        if !c.is_numeric() {
+            start += 1;
+            break;
+        } else {
+            start -= 1;
+        }
+    }
+
+    for i in 0..schematic[row_i].len() {
+        let c = schematic[row_i][start];
+        if c.is_numeric() {
+            chars.push(c);
+            start += 1;
+        } else {
+            break;
+        }
+    }
+
+    chars.iter().collect::<String>().parse::<i32>().unwrap()
 }
 
 fn is_part_number(schematic: &Vec<Vec<char>>, start: usize, end: usize, row: usize) -> bool {
